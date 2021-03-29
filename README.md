@@ -32,3 +32,10 @@ ansible-playbook -i hosts playbook.yml --ask-pass --extra-vars "hosts=cloudy use
 ### Log
 The output of the whole Cloudynitzar process is logged to `/var/log/cloudy/cloudynitzar.log`.
 
+### Kubernetes
+
+Currently (29-Mar-2021) experimenting with k3s deployed via [k3s-ansible](https://github.com/k3s-io/k3s-ansible). This project supports Debian and Ubuntu on x64 and ARM. 
+
+Roadmap:
+* k3s based cluster deployed via Ansible
+* Create high availibility clusters
