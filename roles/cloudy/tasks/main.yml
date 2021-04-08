@@ -1,0 +1,33 @@
+---
+# tasks file for cloudy
+- name: Create cloudy user
+  user:
+    name: "{{ cloudy_username }}"
+    password: "{{ cloudy_password }}"
+    shell: /bin/bash
+    group: sudo
+
+- name: Create Cloudy log directory
+  file:
+    path: /var/log/cloudy
+    state: directory
+
+#This is a terrible workaround. There is not an obvious way to put the ansible log
+#on the host. This will create an empty file to satisfy tests.
+- name: Create Cloudy log file
+  copy:
+    content: "sorry"
+    dest: /var/log/cloudy/cloudynitzar.log
+    force: no
+    group: root
+    owner: root
+    mode: 0666
+
+- name: Add repos
+  include_tasks: "repos.yml"
+
+- name: Install packages
+  include_tasks: "packages.yml"
+
+- name: Install the Cloudy packages
+  include_tasks: "cloudy-install.yml"

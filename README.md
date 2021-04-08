@@ -32,10 +32,67 @@ ansible-playbook -i hosts playbook.yml --ask-pass --extra-vars "hosts=cloudy use
 ### Log
 The output of the whole Cloudynitzar process is logged to `/var/log/cloudy/cloudynitzar.log`.
 
-### Kubernetes
+## Kubernetes
 
-Currently (29-Mar-2021) experimenting with k3s deployed via [k3s-ansible](https://github.com/k3s-io/k3s-ansible). This project supports Debian and Ubuntu on x64 and ARM. 
+### Ceph
 
-Roadmap:
-* k3s based cluster deployed via Ansible
-* Create high availibility clusters
+Ensure /var/lib/rook/ exists
+
+## Ansible and Deployment
+
+On Raspberry Pis add the following to `/boot/cmdline.txt`
+
+`cgroup_memory=1 cgroup_enable=memory`
+
+The included Vagrantfile can be used to quickly spin up a compatible VM. Requires vagrant and virtualbox to be installed. This is very useful for testing.
+
+Install the yaml edit module for ansible
+
+`ansible-galaxy install kwoodson.yedit`
+
+Install Ansible via pip/pip3 to ensure the latest version is installed.
+
+`pip install ansible`
+
+To install the required role:
+
+`ansible-galaxy install xanmanning.k3s`
+
+python-apt must be installed on each inventory host to use check mode
+
+`sudo apt install python-apt`
+
+Check mode performs basic debug checks on each host.
+
+`ansible-playbook -i inventory.yml playbook.yml --check`
+
+Login once to each machine or add them to your ~/.ssh/known_hosts file. Ansible will throw an error when SSH asks you to verify a host.
+
+To reset k3s install:
+
+`ansible-playbook -i inventory.yml playbook.yml --become -e 'k3s_state=uninstalled'`
+
+### Inventory
+
+***MAKE SURE TO CHANGE inventory.yml TO MATCH YOUR ENVIRONMENT***
+
+We seperate inventory based on whether it is a Kubernetes node or Cloudy only node.
+
+### Roles
+
+The roles/ directory contains the Ansible roles.
+
+The directory structure is
+
+```
+group_vars/
+    Variable files defined per inventory group
+roles/
+    <role_name>/
+        meta/
+            Metadata for Ansible Galaxy.
+        tasks/
+            Task files
+        vars/
+            Variables files
+```

@@ -1,0 +1,82 @@
+---
+- name: Gather facts from the remote host
+  setup:
+    delegate_to: "{{ request_host }}"
+    delegate_facts: true
+
+- name: Run whoami without become.
+  command: whoami
+  changed_when: false
+  become: false
+  register: whoami
+  delegate_to: "{{ request_host }}"
+
+- name: Set a fact with the user name.
+  set_fact:
+    login_user: "{{ whoami.stdout }}"
+
+- name: Set the home directory for the request_host
+  set_fact:
+    request_host_ssh_dir: "/home/{{ login_user }}/.ssh"
+
+- name: Print request directory
+  debug:
+    msg: "{{ request_host_ssh_dir }}"
+
+- name: Copy CA pub key from ca_host to request_host
+  synchronize:
+    src: "{{ ca_public_key_location }}"
+    dest: "rsync://{{ request_host }}{{ request_host_ssh_dir }}/"
+    mode: push
+
+- name: Trust root cert on request_host
+  become: yes
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: TrustedUserCAKeys /etc/ssh/ca.pub
+  delegate_to: "{{ request_host }}"
+
+- name: Check if id_rsa exists
+  stat:
+    path: "{{ request_host_ssh_dir }}/id_rsa"
+  register: id_rsa_exists
+  delegate_to: "{{ request_host }}"
+
+#- name: Generate id_rsa on request_host if it doesnt exist
+#  shell: ssh-keygen -N \"\" -f "{{ request_host_ssh_dir }}/id_rsa"
+#  delegate_to: "{{ request_host }}"
+#  when: id_rsa_exists.stat.exists
+
+- name: Pull id_rsa.pub from request_host to ca_host
+  synchronize:
+    src: "{{ request_host_ssh_dir }}/id_rsa.pub"
+    dest: "{{ ca_request_path }}/{{ request_host }}-id_rsa.pub" #/etc/ca/requests
+    mode: push
+  delegate_to: "{{ request_host }}"
+
+- name: Approve request on ca_host
+  shell: "ssh-keygen -s {{ ca_private_key_location }} -I {{ request_host }} -n {{ principals }} -V +{{ valid_weeks }}w -z {{ serial }} {{ ca_request_path }}/{{ request_host }}-id_rsa.pub -f {{ ca_request_path }}/{{ request_host }}-cert.pub"
+
+- name: Copy cert back to request host
+  synchronize:
+    src: "{{ ca_request_path }}/{{ request_host }}-cert.pub"
+    dest: "{{ request_host_ssh_dir }}/id_rsa-cert.pub"
+    mode: pull
+  delegate_to: "{{ request_host }}"
+
+- name: Ensure correct permissions for the cert on request_host
+  file:
+    path: "{{ request_host_ssh_dir }}/id_rsa-cert.pub"
+    mode: '0600'
+  delegate_to: "{{ request_host }}"
+
+- name: Ensure correct permissions id_rsa on request_host
+  file:
+    path: "{{ request_host_ssh_dir }}/id_rsa.pub"
+    mode: '0600'
+  delegate_to: "{{ request_host }}"
+  
+- name: Delete the public key from the ca_host
+  file:
+    path: "{{ ca_request_path }}/{{ request_host }}-id_rsa.pub"
+    state: absent
