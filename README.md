@@ -32,6 +32,12 @@ ansible-playbook -i hosts playbook.yml --ask-pass --extra-vars "hosts=cloudy use
 ### Log
 The output of the whole Cloudynitzar process is logged to `/var/log/cloudy/cloudynitzar.log`.
 
+## Kubernetes
+
+### Ceph
+
+Ensure /var/lib/rook/ exists
+
 ## Ansible and Deployment
 
 On Raspberry Pis add the following to `/boot/cmdline.txt`
