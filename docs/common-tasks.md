@@ -1,8 +1,32 @@
+## Deploying a basic cloud
+
+### Preparing the hardware
+
+Currently Cloudy will work on Ubuntu 18.04, Debian 10, and Raspbian.
+
+The Kubernetes cluster is only working on Arm64 and x86-64 Ubuntu 20.04.
+
+### Build an inventory
+
+The Ansible inventory file defines which hosts we will deploy to. You must be able to SSH into each remote host via public keys from the host you call `ansible-playbook` on. The property `k3s_control_node` is set on each node in order to build a high availibility cluster. The `docker` property is set because we want to use a docker based cluster. A `containerd` based cluster is possible but untested.
+
+### Deploying Cloudy
+
+Cloudy is deployed alongside the Kubernetes cluster and is independent of it. It is possible to deploy any combination of Cloudy and Kubernetes by (un)commenting lines in the file `playbook.yml`.
+
+`ansible-playbook -i inventory.yml playbook.yml`
+
 ### Starting the Kubernetes cluster
 
-The Kubernetes cluster is created by the ansible playbook `playbook.yml`
+Cloudy is deployed alongside the Kubernetes cluster and is independent of it. It is possible to deploy any combination of Cloudy and Kubernetes by (un)commenting lines in the file `playbook.yml`.
+
+`ansible-playbook -i inventory.yml playbook.yml`
 
 ### Deploying Rook and Ceph
+
+From this point on all paths are given relative to `{project_root}/kubernetes/`.
+
+The order of application is important. The cluster must be applied *after* the operator.
 
 `kubectl apply -f ceph/crds.yml -f ceph/common.yml -f ceph/operator.yml`
 
@@ -16,7 +40,7 @@ mysql is needed for Nextcloud and many other services. We deploy a single shared
 
 mysql's persistant volume claim is backed by a `rook-ceph-block`.
 
-`kubectl apply -f mysql/configmap.yml -f mysql/pvc.yml -f mysql/pod.yml`
+`kubectl apply -f mysql/`
 
 To check the status of the PVC:
 
@@ -65,5 +89,3 @@ Some of the tools available:
 Sometimes commands will hang which indicates an unhealthy Ceph cluster. See [here](https://github.com/rook/rook/blob/master/Documentation/ceph-common-issues.md#cluster-failing-to-service-requests) for troubleshooting information.
 
 [source](https://github.com/rook/rook/blob/master/Documentation/ceph-toolbox.md)
-
-### 
