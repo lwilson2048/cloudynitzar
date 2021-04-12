@@ -889,10 +889,18 @@ spec:
                       type: object
                       nullable: true
                       properties:
-                        enabled:
+                        disabled:
                           type: boolean
                         interval:
                           type: string
+                        timeout:
+                          type: string
+                    livenessProbe:
+                      type: object
+                      nullable: true
+                      properties:
+                        disabled:
+                          type: boolean
             status:
               type: object
               x-kubernetes-preserve-unknown-fields: true
@@ -1210,6 +1218,19 @@ spec:
                             type: string
                           startTime:
                             type: string
+                quotas:
+                  type: object
+                  nullable: true
+                  properties:
+                    maxBytes:
+                      type: integer
+                      minimum: 0
+                    maxSize:
+                      pattern: ^[0-9]+[\.]?[0-9]*([KMGTPE][i]?)?$
+                      type: string
+                    maxObjects:
+                      type: integer
+                      minimum: 0
                 statusCheck:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
