@@ -1,0 +1,54 @@
+---
+# tasks file for cuda
+- name: Ensure compatible architecture
+
+- name: Ensure compatible OS
+
+- name: Ensure compatible Docker is installed
+
+- name: Check for compatible GPUs
+
+- name: Add CUDA repo key
+  ansible.builtin.apt_key:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+    state: present
+
+- name: Add nvidia-docker repo key
+  ansible.builtin.apt_key:
+    url: https://nvidia.github.io/nvidia-docker/gpgkey
+    state: present
+
+- name: Add CUDA repo
+  ansible.builtin.apt_repository:
+    repo: deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /
+    state: present
+    update_cache: no
+
+- name: Add libnvidia-container repo
+  ansible.builtin.apt_repository:
+    repo: deb https://nvidia.github.io/libnvidia-container/stable/ubuntu18.04/amd64
+    state: present
+    update_cache: no
+
+- name: Add nvidia-container-runtime repo
+  ansible.builtin.apt_repository:
+    repo: deb https://nvidia.github.io/nvidia-container-runtime/stable/ubuntu18.04/amd64
+    state: present
+    update_cache: no
+
+- name: Add nvidia-docker repo
+  ansible.builtin.apt_repository:
+    repo: deb https://nvidia.github.io/nvidia-docker/ubuntu18.04/amd64
+    state: present
+    update_cache: no
+
+- name: Install CUDA drivers and nvidia-docker2
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - nvidia-docker2
+    - cuda-drivers
+    - "linux-headers-{{ ansible_kernel }}"
