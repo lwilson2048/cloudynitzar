@@ -89,3 +89,7 @@ Some of the tools available:
 Sometimes commands will hang which indicates an unhealthy Ceph cluster. See [here](https://github.com/rook/rook/blob/master/Documentation/ceph-common-issues.md#cluster-failing-to-service-requests) for troubleshooting information.
 
 [source](https://github.com/rook/rook/blob/master/Documentation/ceph-toolbox.md)
+
+### Run a busy box container for network diagnoses
+
+`kubectl run -it --rm --restart=Never busybox --image=busybox:1.28 -- ping 8.8.8.8`

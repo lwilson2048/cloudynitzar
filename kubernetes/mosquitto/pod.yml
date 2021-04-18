@@ -4,10 +4,12 @@ metadata:
   name: mosquitto-server
   namespace: cloudy
 spec:
+  type: NodePort
   ports:
   - name: mqtt
     protocol: TCP
     port: 1883
+    nodePort: 31231
   - name: http
     protocol: TCP
     port: 9001

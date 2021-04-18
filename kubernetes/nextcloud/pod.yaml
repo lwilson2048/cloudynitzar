@@ -4,10 +4,12 @@ metadata:
   name: nextcloud-server
   namespace: cloudy
 spec:
+  type: NodePort
   ports:
   - name: http
     protocol: TCP
     port: 80
+    nodePort: 31880
   selector:
     app: nextcloud
 ---
@@ -30,14 +32,14 @@ spec:
       containers:
       - image: nextcloud:21-apache
         env:
-        - name: MYSQL_DATABASE
-          value: nextcloud
-        - name: MYSQL_USER
-          value: nextcloud
-        - name: MYSQL_PASSWORD
-          value: nextcloudpass
-        - name: MYSQL_HOST
-          value: mysql-server.cloudy
+        #- name: MYSQL_DATABASE
+        #  value: nextcloud
+        #- name: MYSQL_USER
+        #  value: nextcloud
+        #- name: MYSQL_PASSWORD
+        #  value: nextcloudpass
+        #- name: MYSQL_HOST
+        #  value: mysql-server.cloudy
         # Use either an S3 object endpoint or the Ceph backed volume below
         #- name: NEXTCLOUD_ADMIN_USER
         #  value: 
