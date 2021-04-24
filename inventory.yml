@@ -4,9 +4,9 @@ all:
     kubernetes:
       hosts:
         #Youll need to change these for your actual environment
-        leena-desktop-ubuntu:
-          ansible_user: ansible
-          ansible_host: 10.149.201.242
+        leena-desktop:
+          ansible_user: honeybee
+          ansible_host: 10.149.201.241
           k3s_control_node: true
           docker: true
         honeybee:
@@ -15,7 +15,6 @@ all:
           k3s_control_node: true
           docker: true
         ubuntu:
-          ansible_user: pi
+          ansible_user: honeybee
           ansible_host: 10.149.69.70
-          k3s_control_node: true
           docker: true
